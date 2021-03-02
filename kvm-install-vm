@@ -62,7 +62,6 @@ function usage_subcommand ()
             printf "    -p          Console port          (default: auto)\n"
             printf "    -s          Custom shell script\n"
             printf "    -t          Linux Distribution    (default: centos8)\n"
-            printf "    -T          Timezone              (default: US/Eastern)\n"
             printf "    -u          Custom user           (default: $USER)\n"
             printf "    -y          Assume yes to prompts (default: false)\n"
             printf "    -n          Assume no to prompts  (default: false)\n"
@@ -70,21 +69,11 @@ function usage_subcommand ()
             printf "\n"
             printf "DISTRIBUTIONS\n"
             printf "    NAME            DESCRIPTION                         LOGIN\n"
-            printf "    amazon2         Amazon Linux 2                      ec2-user\n"
-            printf "    centos8         CentOS 8                            centos\n"
             printf "    centos7         CentOS 7                            centos\n"
-            printf "    centos7-atomic  CentOS 7 Atomic Host                centos\n"
-            printf "    centos6         CentOS 6                            centos\n"
             printf "    debian9         Debian 9 (Stretch)                  debian\n"
             printf "    debian10        Debian 10 (Buster)                  debian\n"
-            printf "    fedora29        Fedora 29                           fedora\n"
-            printf "    fedora29-atomic Fedora 29 Atomic Host               fedora\n"
-            printf "    fedora30        Fedora 30                           fedora\n"
-            printf "    fedora31        Fedora 31                           fedora\n"
-            printf "    fedora32        Fedora 32                           fedora\n"
-            printf "    opensuse15      OpenSUSE Leap 15.2                  opensuse\n"
-            printf "    ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
-            printf "    ubuntu1804      Ubuntu 18.04 LTS (Bionic Beaver)    ubuntu\n"
+            printf "    debian11        Debian 11 (Bullseye)                debian\n"
+            printf "    fedora33        Fedora 33                           fedora\n"
             printf "    ubuntu2004      Ubuntu 20.04 LTS (Focal Fossa)      ubuntu\n"
             printf "\n"
             printf "EXAMPLES\n"
@@ -98,9 +87,6 @@ function usage_subcommand ()
             printf "\n"
             printf "    $prog create -t debian9 foo\n"
             printf "        Create a Debian 9 VM with the default parameters.\n"
-            printf "\n"
-            printf "    $prog create -T UTC foo\n"
-            printf "        Create a default VM with UTC timezone.\n"
             printf "\n"
             ;;
         remove)
@@ -291,57 +277,16 @@ function fetch_images ()
     # Set variables based on $DISTRO
     # Use the command "osinfo-query os" to get the list of the accepted OS variants.
     case "$DISTRO" in
-        amazon2)
-            QCOW=amzn2-kvm-2.0.20190313-x86_64.xfs.gpt.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="auto"
-            IMAGE_URL=https://cdn.amazonlinux.com/os-images/2.0.20190313/kvm
-            DISK_FORMAT=qcow2
-            LOGIN_USER=ec2-user
-            ;;
-        centos8)
-            QCOW=CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="centos8"
-            IMAGE_URL=https://cloud.centos.org/centos/8/x86_64/images
-            DISK_FORMAT=qcow2
-            LOGIN_USER=centos
-            ;;
         centos7)
-            QCOW=CentOS-7-x86_64-GenericCloud.qcow2
+            QCOW=CentOS-7-aarch64-GenericCloud-2009.qcow2c
             OS_TYPE="linux"
             OS_VARIANT="centos7.0"
             IMAGE_URL=https://cloud.centos.org/centos/7/images
             DISK_FORMAT=qcow2
             LOGIN_USER=centos
             ;;
-        centos7-atomic)
-            QCOW=CentOS-Atomic-Host-7-GenericCloud.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="centos7.0"
-            IMAGE_URL=http://cloud.centos.org/centos/7/atomic/images
-            DISK_FORMAT=qcow2
-            LOGIN_USER=centos
-            ;;
-        centos6)
-            QCOW=CentOS-6-x86_64-GenericCloud.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="centos6.9"
-            IMAGE_URL=https://cloud.centos.org/centos/6/images
-            DISK_FORMAT=qcow2
-            LOGIN_USER=centos
-            ;;
-        debian8)
-            # FIXME: Not yet working.
-            QCOW=debian-8-openstack-amd64.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="debian8"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-8
-            DISK_FORMAT=qcow2
-            LOGIN_USER=debian
-            ;;
         debian9)
-            QCOW=debian-9-openstack-amd64.qcow2
+            QCOW=debian-9-openstack-arm64.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian9"
             IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-9
@@ -349,84 +294,36 @@ function fetch_images ()
             LOGIN_USER=debian
             ;;
         debian10)
-            QCOW=debian-10-openstack-amd64.qcow2
+            QCOW=debian-10-openstack-arm64.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian10"
             IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-10
             DISK_FORMAT=qcow2
             LOGIN_USER=debian
             ;;
-        fedora29)
-          QCOW=Fedora-Cloud-Base-29-1.2.x86_64.qcow2
-          OS_TYPE="linux"
-          OS_VARIANT="fedora29"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Cloud/x86_64/images
-          DISK_FORMAT=qcow2
-          LOGIN_USER=fedora
-          ;;
-        fedora29-atomic)
-          QCOW=Fedora-AtomicHost-29-20190611.0.x86_64.qcow2
-          OS_TYPE="linux"
-          OS_VARIANT="fedora29"
-          IMAGE_URL=https://download.fedoraproject.org/pub/alt/atomic/stable/Fedora-29-updates-20190611.0/AtomicHost/x86_64/images/
-          DISK_FORMAT=qcow2
-          LOGIN_USER=fedora
-          ;;
-        fedora30)
-          QCOW=Fedora-Cloud-Base-30-1.2.x86_64.qcow2
-          OS_TYPE="linux"
-          OS_VARIANT="fedora29"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/30/Cloud/x86_64/images
-          DISK_FORMAT=qcow2
-          LOGIN_USER=fedora
-          ;;
-        fedora31)
-          QCOW=Fedora-Cloud-Base-31-1.9.x86_64.qcow2
-          OS_TYPE="linux"
-          OS_VARIANT="fedora31"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images
-          DISK_FORMAT=qcow2
-          LOGIN_USER=fedora
-          ;;
-       fedora32)
-          QCOW=Fedora-Cloud-Base-32-1.6.x86_64.qcow2
-          OS_TYPE="linux"
-          OS_VARIANT="fedora32"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/32/Cloud/x86_64/images
-          DISK_FORMAT=qcow2
-          LOGIN_USER=fedora
-          ;;
-        ubuntu1604)
-            QCOW=ubuntu-16.04-server-cloudimg-amd64-disk1.img
+        debian11)        
+            QCOW=debian-testing-openstack-arm64.qcow2
             OS_TYPE="linux"
-            OS_VARIANT="ubuntu16.04"
-            IMAGE_URL=https://cloud-images.ubuntu.com/releases/16.04/release
+            OS_VARIANT="debian10"
+            IMAGE_URL=https://cdimage.debian.org/cdimage/cloud/OpenStack/testing
             DISK_FORMAT=qcow2
-            LOGIN_USER=ubuntu
-            ;;
-        ubuntu1804)
-            QCOW=ubuntu-18.04-server-cloudimg-amd64.img
-            OS_TYPE="linux"
-            OS_VARIANT="ubuntu18.04"
-            IMAGE_URL=https://cloud-images.ubuntu.com/releases/18.04/release
-            DISK_FORMAT=qcow2
-            LOGIN_USER=ubuntu
-            ;;
+            LOGIN_USER=debian
+            ;;            
+       fedora33)
+          QCOW=Fedora-Cloud-Base-33-1.2.aarch64.qcow2
+          OS_TYPE="linux"
+          OS_VARIANT="fedora33"
+          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/aarch64/images
+          DISK_FORMAT=qcow2
+          LOGIN_USER=fedora
+          ;;
         ubuntu2004)
-            QCOW=ubuntu-20.04-server-cloudimg-amd64.img
+            QCOW=ubuntu-20.04-server-cloudimg-arm64.img
             OS_TYPE="linux"
             OS_VARIANT="ubuntu20.04"
             IMAGE_URL=https://cloud-images.ubuntu.com/releases/20.04/release
             DISK_FORMAT=qcow2
             LOGIN_USER=ubuntu
-            ;;
-        opensuse15)
-            QCOW=openSUSE-Leap-15.2-OpenStack.x86_64.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="opensuse15.0"
-            IMAGE_URL=https://download.opensuse.org/repositories/Cloud:/Images:/Leap_15.2/images
-            DISK_FORMAT=qcow2
-            LOGIN_USER=opensuse
             ;;
         *)
             die "${DISTRO} not a supported OS.  Run 'kvm-install-vm create help'."
@@ -606,8 +503,6 @@ ssh_genkeytypes: ['ed25519', 'rsa']
 ssh_authorized_keys:
   - ${KEY}
 
-timezone: ${TIMEZONE}
-
 # Remove cloud-init when finished with it
 runcmd:
   - ${NETRESTART}
@@ -725,7 +620,6 @@ _EOF_
         --name=${VMNAME} \
         --memory=${MEMORY} \
         --vcpus=${CPUS} \
-        --cpu=${FEATURE} \
         ${DISK_OPTION} \
         ${CI_ISO_OPTION} \
         ${NETWORK_OPTION} \
@@ -829,9 +723,8 @@ function remove ()
 function set_defaults ()
 {
     # Defaults are set here. Override using command line arguments.
-    AUTOSTART=false                 # Automatically start VM at boot time
+    AUTOSTART=true                 # Automatically start VM at boot time
     CPUS=1                          # Number of virtual CPUs
-    FEATURE=host                    # Use host cpu features to the guest
     MEMORY=1024                     # Amount of RAM in MB
     DISK_SIZE=""                    # Disk Size in GB
     DNSDOMAIN=example.local         # DNS domain
@@ -839,12 +732,11 @@ function set_defaults ()
     RESIZE_DISK=false               # Resize disk (boolean)
     IMAGEDIR=${HOME}/virt/images    # Directory to store images
     VMDIR=${HOME}/virt/vms          # Directory to store virtual machines
-    BRIDGE=virbr0                   # Hypervisor bridge
+    BRIDGE=br0                   # Hypervisor bridge
     PUBKEY=""                       # SSH public key
-    DISTRO=centos8                  # Distribution
+    DISTRO=debian10                  # Distribution
     MACADDRESS=""                   # MAC Address
     PORT=-1                         # Console port
-    TIMEZONE=US/Eastern             # Timezone
     ADDITIONAL_USER=${USER}         # User
     ASSUME_YES=0                    # Assume yes to prompts
     ASSUME_NO=0                     # Assume no to prompts
@@ -884,7 +776,6 @@ function create ()
             c ) CPUS="${OPTARG}" ;;
             d ) DISK_SIZE="${OPTARG}" ;;
             D ) DNSDOMAIN="${OPTARG}" ;;
-            f ) FEATURE="${OPTARG}" ;;
             g ) GRAPHICS="${OPTARG}" ;;
             i ) IMAGE="${OPTARG}" ;;
             k ) PUBKEY="${OPTARG}" ;;
@@ -895,7 +786,6 @@ function create ()
             p ) PORT="${OPTARG}" ;;
             s ) SCRIPTNAME="${OPTARG}" ;;
             t ) DISTRO="${OPTARG}" ;;
-            T ) TIMEZONE="${OPTARG}" ;;
             u ) ADDITIONAL_USER="${OPTARG}" ;;
             y ) ASSUME_YES=1 ;;
             n ) ASSUME_NO=1 ;;
