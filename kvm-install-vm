@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export LIBVIRT_DEFAULT_URI=qemu:///system
+
 # Set program name variable - basename without subshell
 prog=${0##*/}
 
@@ -615,7 +617,8 @@ _EOF_
 
     # Call virt-install to import the cloud image and create a new VM
     run "Installing the domain" \
-        virt-install --import \
+        virt-install --connect qemu:///system \
+        --import \
         --name=${VMNAME} \
         --memory=${MEMORY} \
         --vcpus=${CPUS} \
@@ -729,8 +732,8 @@ function set_defaults ()
     DNSDOMAIN=example.local         # DNS domain
     GRAPHICS=spice                  # Graphics type or "auto"
     RESIZE_DISK=false               # Resize disk (boolean)
-    IMAGEDIR=${HOME}/virt/images    # Directory to store images
-    VMDIR=${HOME}/virt/vms          # Directory to store virtual machines
+    IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
+    VMDIR=${IMAGEDIR}          # Directory to store virtual machines
     BRIDGE=br0                      # Hypervisor bridge
     PUBKEY=""                       # SSH public key
     DISTRO=debian10                 # Distribution
