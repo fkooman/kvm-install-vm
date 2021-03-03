@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-LIBVIRT_DEFAULT_URI=qemu:///system
+export LIBVIRT_DEFAULT_URI=qemu:///system
 
 # Set program name variable - basename without subshell
 prog=${0##*/}
