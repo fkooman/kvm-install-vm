@@ -63,7 +63,6 @@ function usage_subcommand ()
             printf "    -p          Console port          (default: auto)\n"
             printf "    -s          Custom shell script\n"
             printf "    -t          Linux Distribution    (default: debian10)\n"
-            printf "    -u          Custom user           (default: $USER)\n"
             printf "    -y          Assume yes to prompts (default: false)\n"
             printf "    -n          Assume no to prompts  (default: false)\n"
             printf "    -v          Be verbose\n"
@@ -482,16 +481,6 @@ preserve_hostname: False
 hostname: ${VMNAME}
 fqdn: ${VMNAME}.${DNSDOMAIN}
 
-# Users
-users:
-    - default
-    - name: ${ADDITIONAL_USER}
-      groups: ['${SUDOGROUP}']
-      shell: /bin/bash
-      sudo: ALL=(ALL) NOPASSWD:ALL
-      ssh-authorized-keys:
-        - ${KEY}
-
 # Configure where output will go
 output:
   all: ">> /var/log/cloud-init.log"
@@ -727,7 +716,6 @@ function set_defaults ()
     DISTRO=debian10                 # Distribution
     MACADDRESS=""                   # MAC Address
     PORT=-1                         # Console port
-    ADDITIONAL_USER=${USER}         # User
     ASSUME_YES=0                    # Assume yes to prompts
     ASSUME_NO=0                     # Assume no to prompts
     VERBOSE=0                       # Verbosity
@@ -776,7 +764,6 @@ function create ()
             p ) PORT="${OPTARG}" ;;
             s ) SCRIPTNAME="${OPTARG}" ;;
             t ) DISTRO="${OPTARG}" ;;
-            u ) ADDITIONAL_USER="${OPTARG}" ;;
             y ) ASSUME_YES=1 ;;
             n ) ASSUME_NO=1 ;;
             v ) VERBOSE=1 ;;
