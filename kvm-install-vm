@@ -506,10 +506,14 @@ _EOF_
     qemu-img create -q -f qcow2 -F qcow2 -b $IMAGE $DISK && ok
     if $RESIZE_DISK
     then
+        case "${DISTRO}" in
+            debian11 )  ROOT_PARTITION=/dev/sda15;;
+            *)          ROOT_PARTITION=/dev/sda2;;
+        esac
         outputn "Resizing the disk to $DISK_SIZE"
         qemu-img create -f qcow2 \
             -o preallocation=metadata $DISK.new $DISK_SIZE &>> ${VMNAME}.log \
-            && virt-resize --quiet --expand /dev/sda2 $DISK $DISK.new &>> ${VMNAME}.log \
+            && virt-resize --quiet --expand ${ROOT_PARTITION} $DISK $DISK.new &>> ${VMNAME}.log \
             && (mv $DISK.new $DISK && ok) \
             || die "Could not resize disk."
     fi
