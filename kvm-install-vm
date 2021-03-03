@@ -288,10 +288,10 @@ function fetch_images ()
             LOGIN_USER=debian
             ;;
         debian10)
-            QCOW=debian-10-openstack-arm64.qcow2
+            QCOW=debian-10-generic-arm64-20210208-542.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian10"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-10
+            IMAGE_URL=https://cloud.debian.org/images/cloud/buster/20210208-542
             DISK_FORMAT=qcow2
             LOGIN_USER=debian
             ;;
@@ -508,7 +508,7 @@ _EOF_
     then
         outputn "Resizing the disk to $DISK_SIZE"
         case "${DISTRO}" in
-            debian11 )
+            debian1*)
                 qemu-img resize $DISK $DISK_SIZE &>> ${VMNAME}.log \
                     && ok \
                     || die "Could not resize disk."
