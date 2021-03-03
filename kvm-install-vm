@@ -351,22 +351,10 @@ function fetch_images ()
 
 function check_ssh_key ()
 {
-    local key
-    if [ -z "${PUBKEY}" ]; then
-        # Try to find a suitable key file.
-        for key in ~/.ssh/id_{rsa,dsa,ed25519}.pub; do
-            if [ -f "$key" ]; then
-                PUBKEY="$key"
-                break
-            fi
-        done
-    fi
-
     if [ ! -f "${PUBKEY}" ]
     then
         # Check for existence of a pubkey, or else exit with message
-        die "Please generate an SSH keypair using 'ssh-keygen -t rsa' or \
-             specify one with the "-k" flag."
+        die "Please specify an SSH public key with the "-k" flag"
     else
         # Place contents of $PUBKEY into $KEY
         KEY=$(<${PUBKEY})
