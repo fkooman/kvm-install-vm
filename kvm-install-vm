@@ -52,7 +52,6 @@ function usage_subcommand ()
             printf "    -c          Number of vCPUs       (default: 1)\n"
             printf "    -d          Disk Size (GB)        (default: 10)\n"
             printf "    -D          DNS Domain            (default: example.local)\n"
-            printf "    -g          Graphics type         (default: spice)\n"
             printf "    -h          Display help\n"
             printf "    -i          Custom QCOW2 Image\n"
             printf "    -k          SSH Public Key        (default: $HOME/.ssh/id_rsa.pub)\n"
@@ -60,7 +59,6 @@ function usage_subcommand ()
             printf "    -L          Location of VMs       (default: $HOME/virt/vms)\n"
             printf "    -m          Memory Size (MB)      (default: 1024)\n"
             printf "    -M          Mac address           (default: auto-assigned)\n"
-            printf "    -p          Console port          (default: auto)\n"
             printf "    -s          Custom shell script\n"
             printf "    -t          Linux Distribution    (default: debian10)\n"
             printf "    -y          Assume yes to prompts (default: false)\n"
@@ -574,23 +572,10 @@ _EOF_
         ${CI_ISO} \
         ${CI_ISO_EXTRA})"
 
-    # Omit the --graphics option to auto-detect.
-    if [ "${GRAPHICS}" = 'auto' ]
-    then
-        GRAPHICS_PARAMS=""
-    else
-        GRAPHICS_PARAMS="$(join ',' \
-            ${GRAPHICS} \
-            $(param port ${PORT}) \
-            $(param listen ${GRAPHICS_LISTEN}) \
-            ${GRAPHICS_EXTRA})"
-    fi
-
     # Assemble virt-install options.
     NETWORK_OPTION="$(param --network ${NETWORK_PARAMS})"
     DISK_OPTION="$(param --disk ${DISK_PARAMS})"
     CI_ISO_OPTION="$(param --disk ${CI_ISO_PARAMS})"
-    GRAPHICS_OPTION="$(param --graphics ${GRAPHICS_PARAMS})"
 
     # Call virt-install to import the cloud image and create a new VM
     run "Installing the domain" \
@@ -605,7 +590,6 @@ _EOF_
         --os-type=${OS_TYPE} \
         --os-variant=${OS_VARIANT} \
         --noautoconsole \
-        ${GRAPHICS_OPTION} \
         ${VIRT_INSTALL_EXTRA} \
         || die "Could not create domain with virt-install."
 
@@ -655,16 +639,6 @@ _EOF_
 
     printf "\n"
     output "SSH to ${VMNAME}: 'ssh ${LOGIN_USER}@${IP}' or 'ssh ${LOGIN_USER}@${VMNAME}'"
-    CONSOLE=$(virsh domdisplay ${VMNAME})
-    # Workaround because VNC port number shown by virsh domdisplay is offset from 5900
-    if [ "${GRAPHICS}" = 'vnc' ]
-    then
-        CONSOLE_NO_PORT=$(echo $CONSOLE | cut -d ':' -f 1,2 -)
-        CONSOLE_PORT=$(expr 5900 + $(echo $CONSOLE | cut -d ':' -f 3 -))
-        output "Console at ${CONSOLE_NO_PORT}:${CONSOLE_PORT}"
-    else
-        output "Console at ${CONSOLE}"
-    fi
     output "DONE"
 
     popd
@@ -707,7 +681,6 @@ function set_defaults ()
     MEMORY=1024                     # Amount of RAM in MB
     DISK_SIZE=10                    # Disk Size in GB
     DNSDOMAIN=example.local         # DNS domain
-    GRAPHICS=spice                  # Graphics type or "auto"
     RESIZE_DISK=true               # Resize disk (boolean)
     IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
     VMDIR=${IMAGEDIR}          # Directory to store virtual machines
@@ -715,7 +688,6 @@ function set_defaults ()
     PUBKEY=""                       # SSH public key
     DISTRO=debian10                 # Distribution
     MACADDRESS=""                   # MAC Address
-    PORT=-1                         # Console port
     ASSUME_YES=0                    # Assume yes to prompts
     ASSUME_NO=0                     # Assume no to prompts
     VERBOSE=0                       # Verbosity
@@ -729,8 +701,6 @@ function set_defaults ()
     DISK_BUS=virtio
     DISK_EXTRA=""
     CI_ISO_EXTRA=""
-    GRAPHICS_LISTEN=localhost
-    GRAPHICS_EXTRA=""
     VIRT_INSTALL_EXTRA=""
 }
 
@@ -754,7 +724,6 @@ function create ()
             c ) CPUS="${OPTARG}" ;;
             d ) DISK_SIZE="${OPTARG}" ;;
             D ) DNSDOMAIN="${OPTARG}" ;;
-            g ) GRAPHICS="${OPTARG}" ;;
             i ) IMAGE="${OPTARG}" ;;
             k ) PUBKEY="${OPTARG}" ;;
             l ) IMAGEDIR="${OPTARG}" ;;
