@@ -296,10 +296,10 @@ function fetch_images ()
             LOGIN_USER=debian
             ;;
         debian11)        
-            QCOW=debian-testing-openstack-arm64.qcow2
+            QCOW=debian-11-generic-arm64-daily-20210303-565.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian10"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/cloud/OpenStack/testing
+            IMAGE_URL=https://cloud.debian.org/images/cloud/bullseye/daily/20210303-565
             DISK_FORMAT=qcow2
             LOGIN_USER=debian
             ;;            
