@@ -536,23 +536,11 @@ _EOF_
     if $RESIZE_DISK
     then
         outputn "Resizing the disk to $DISK_SIZE"
-        # Workaround to prevent virt-resize from renumbering partitions and breaking grub
-        # See https://bugzilla.redhat.com/show_bug.cgi?id=1472039
-        # Ubuntu will automatically grow the partition to the new size on its first boot
-        case "$DISTRO" in
-        ubuntu*|amazon2)
-            qemu-img resize $DISK $DISK_SIZE &>> ${VMNAME}.log \
-                && ok \
-                || die "Could not resize disk."
-            ;;
-        *)
-            qemu-img create -f qcow2 \
-                -o preallocation=metadata $DISK.new $DISK_SIZE &>> ${VMNAME}.log \
-                && virt-resize --quiet --expand /dev/sda1 $DISK $DISK.new &>> ${VMNAME}.log \
-                && (mv $DISK.new $DISK && ok) \
-                || die "Could not resize disk."
-            ;;
-        esac
+        qemu-img create -f qcow2 \
+            -o preallocation=metadata $DISK.new $DISK_SIZE &>> ${VMNAME}.log \
+            && virt-resize --quiet --expand /dev/sda2 $DISK $DISK.new &>> ${VMNAME}.log \
+            && (mv $DISK.new $DISK && ok) \
+            || die "Could not resize disk."
     fi
 
     # Create CD-ROM ISO with cloud-init config
@@ -728,10 +716,10 @@ function set_defaults ()
     AUTOSTART=true                 # Automatically start VM at boot time
     CPUS=1                          # Number of virtual CPUs
     MEMORY=1024                     # Amount of RAM in MB
-    DISK_SIZE=""                    # Disk Size in GB
+    DISK_SIZE=10                    # Disk Size in GB
     DNSDOMAIN=example.local         # DNS domain
     GRAPHICS=spice                  # Graphics type or "auto"
-    RESIZE_DISK=false               # Resize disk (boolean)
+    RESIZE_DISK=true               # Resize disk (boolean)
     IMAGEDIR=/var/lib/libvirt/images    # Directory to store images
     VMDIR=${IMAGEDIR}          # Directory to store virtual machines
     BRIDGE=br0                      # Hypervisor bridge
