@@ -3,6 +3,20 @@ set -e
 
 export LIBVIRT_DEFAULT_URI=qemu:///system
 
+ARCH=$(uname -i)
+case "${ARCH}" in
+    x86_64)
+        DEB_ARCH=amd64
+        ;;
+    aarch64)
+        DEB_ARCH=arm64
+        ;;
+    *)
+        printf "arch ${ARCH} not supported!"
+        exit 1
+        ;;
+esac
+
 # Set program name variable - basename without subshell
 prog=${0##*/}
 
@@ -66,7 +80,6 @@ function usage_subcommand ()
             printf "DISTRIBUTIONS\n"
             printf "    NAME            DESCRIPTION                         LOGIN\n"
             printf "    centos7         CentOS 7                            centos\n"
-            printf "    debian9         Debian 9 (Stretch)                  debian\n"
             printf "    debian10        Debian 10 (Buster)                  debian\n"
             printf "    debian11        Debian 11 (Bullseye)                debian\n"
             printf "    fedora33        Fedora 33                           fedora\n"
@@ -81,8 +94,8 @@ function usage_subcommand ()
             printf "        Create VM with custom parameters: 2 vCPUs, 2GB RAM, and 20GB disk\n"
             printf "        capacity.\n"
             printf "\n"
-            printf "    $prog create -t debian9 foo\n"
-            printf "        Create a Debian 9 VM with the default parameters.\n"
+            printf "    $prog create -t centos7 foo\n"
+            printf "        Create a CentOS 7 VM with the default parameters.\n"
             printf "\n"
             ;;
         remove)
@@ -272,23 +285,15 @@ function fetch_images ()
     # Use the command "osinfo-query os" to get the list of the accepted OS variants.
     case "$DISTRO" in
         centos7)
-            QCOW=CentOS-7-aarch64-GenericCloud-2009.qcow2c
+            QCOW=CentOS-7-${ARCH}-GenericCloud-2009.qcow2c
             OS_TYPE="linux"
             OS_VARIANT="centos7.0"
             IMAGE_URL=https://cloud.centos.org/centos/7/images
             DISK_FORMAT=qcow2
             LOGIN_USER=centos
             ;;
-        debian9)
-            QCOW=debian-9-openstack-arm64.qcow2
-            OS_TYPE="linux"
-            OS_VARIANT="debian9"
-            IMAGE_URL=https://cdimage.debian.org/cdimage/openstack/current-9
-            DISK_FORMAT=qcow2
-            LOGIN_USER=debian
-            ;;
         debian10)
-            QCOW=debian-10-generic-arm64-20210208-542.qcow2
+            QCOW=debian-10-generic-${DEB_ARCH}-20210208-542.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian10"
             IMAGE_URL=https://cloud.debian.org/images/cloud/buster/20210208-542
@@ -296,7 +301,7 @@ function fetch_images ()
             LOGIN_USER=debian
             ;;
         debian11)        
-            QCOW=debian-11-generic-arm64-daily-20210303-565.qcow2
+            QCOW=debian-11-generic-${DEB_ARCH}-daily-20210303-565.qcow2
             OS_TYPE="linux"
             OS_VARIANT="debian10"
             IMAGE_URL=https://cloud.debian.org/images/cloud/bullseye/daily/20210303-565
@@ -304,15 +309,15 @@ function fetch_images ()
             LOGIN_USER=debian
             ;;            
        fedora33)
-          QCOW=Fedora-Cloud-Base-33-1.2.aarch64.qcow2
+          QCOW=Fedora-Cloud-Base-33-1.2.${ARCH}.qcow2
           OS_TYPE="linux"
           OS_VARIANT="fedora33"
-          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/aarch64/images
+          IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/${ARCH}/images
           DISK_FORMAT=qcow2
           LOGIN_USER=fedora
           ;;
         ubuntu2004)
-            QCOW=ubuntu-20.04-server-cloudimg-arm64.img
+            QCOW=ubuntu-20.04-server-cloudimg-${DEB_ARCH}.img
             OS_TYPE="linux"
             OS_VARIANT="ubuntu20.04"
             IMAGE_URL=https://cloud-images.ubuntu.com/releases/20.04/release
