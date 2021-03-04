@@ -3,7 +3,7 @@ set -e
 
 export LIBVIRT_DEFAULT_URI=qemu:///system
 
-ARCH=$(uname -i)
+ARCH=$(uname -m)
 case "${ARCH}" in
     x86_64)
         DEB_ARCH=amd64
