@@ -311,7 +311,8 @@ function fetch_images ()
        fedora33)
           QCOW=Fedora-Cloud-Base-33-1.2.${ARCH}.qcow2
           OS_TYPE="linux"
-          OS_VARIANT="fedora33"
+          # Debian 10 does not know about "fedora33" yet
+          OS_VARIANT="fedora-unknown"
           IMAGE_URL=https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/${ARCH}/images
           DISK_FORMAT=qcow2
           LOGIN_USER=fedora
